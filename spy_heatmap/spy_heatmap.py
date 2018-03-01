@@ -7,6 +7,8 @@ import urllib
 import urllib2
 import json
 
+
+
 API_KEY='WM49A5VBG9UVXZTD'
 
 def get_symbols():
@@ -33,15 +35,27 @@ def get_symbols():
 '''
 
 def get_ticker(symbol):
-    url='https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo'
-    response = urllib2.urlopen(base_url + "/book/ethusd",data)
+    #https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=15min&outputsize=full&apikey=demo
+    url='https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol='+symbol+'&interval=1min&outputsize=compact&apikey='
+    response = urllib2.urlopen(url+API_KEY)
     #print(type(response))
     #sp=response.read().split('},{')
     rsp=response.read()
     data=json.loads(rsp)
-    
-    return data
+    last_time=data["Meta Data"]["3. Last Refreshed"]
+    ticker=data['Time Series (1min)'][last_time]
+    return ticker
 
 if __name__=="__main__":
-    data=get_symbols()
-    print data
+    syms=get_symbols()
+    #this eventually fails because of a limit of 1 request per second
+    #todo: use the endpoint to get up to 100 at a time
+    for sym in syms:
+        ticker=get_ticker(sym)
+        print sym,ticker['4. close']
+        '''
+    ticker=get_ticker(syms[0])
+    print syms[0]
+    for key in ticker:
+        print key, ticker[key]
+'''
