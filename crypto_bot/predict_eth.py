@@ -45,5 +45,6 @@ def add_dp():
     return row
 if __name__ =='__main__':
     while True:
-        add_dp()
+        #add_dp()
+        run()
         time.sleep(5)
