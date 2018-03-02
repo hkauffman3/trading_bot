@@ -13,26 +13,34 @@ API_KEY='WM49A5VBG9UVXZTD'
 
 def get_symbols():
     symbols=[]
+    syms={}
     url='https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
     response=urllib2.urlopen("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
     starter='<td>'
     ender='</td>'
+    tab_i='<tr>'
+    tab_f='</tr>'
     sig="nofollow"
     data=response.read()
     nyse="XNYS:"
     nasdaq="symbol/"
-    while data.find(starter)!=-1 and data.find(ender)!=-1:
-        section=data[(data.find(starter)+len(starter)):data.find(ender)]
-        if sig in section and (nasdaq in section or nyse in section):
-            symbols.append(section[section.find('">')+2:section.find("</a>")])
-        data=data[data.find(ender)+len(ender):]
-    return symbols
-'''
-            if nyse in section:
-                symbols.append(section[section.find(nyse)+len(nyse):section.find('"',section.find(nyse))])
-            elif nasdaq in section:
-                symbols.append(section[section.find(nasdaq)+len(nasdaq):section.find('"',section.find(nasdaq))])
-'''
+    #print data
+    while data.find(tab_i)!=-1 and data.find(tab_f)!=-1:
+        section=data[(data.find(tab_i)+len(tab_i)):data.find(tab_f)]
+        if sig in section:
+            #print section
+            industry = section.split('\n')[4][4:-5]
+            sym_line = section.split('\n')[1]
+            #print sym_line
+            sym = sym_line[sym_line.find('">')+2:sym_line.find("</a>")]
+            if industry in syms.keys():
+                syms[industry].append(sym)
+            else:
+                syms[industry]=[sym]
+                
+            #print '**********************************************************'
+        data=data[data.find(tab_f)+len(tab_f):]
+    return syms
 
 def get_ticker(symbol):
     #https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=15min&outputsize=full&apikey=demo
@@ -46,14 +54,34 @@ def get_ticker(symbol):
     ticker=data['Time Series (1min)'][last_time]
     return ticker
 
+def get_batch_tickers(symbols):
+    if len(symbols)>100:
+        return -1
+    syms=','.join(symbols)
+    url='https://www.alphavantage.co/query?function=BATCH_STOCK_QUOTES&symbols='+syms+'&apikey='+API_KEY
+    response = urllib2.urlopen(url)
+    rsp=response.read()
+    data=json.loads(rsp)
+    return data
+
 if __name__=="__main__":
     syms=get_symbols()
+    sum=0
+    print syms
+    for ind in syms:
+        sum+=len(syms[ind])
+        print ind, len(syms[ind])
+    print sum
     #this eventually fails because of a limit of 1 request per second
     #todo: use the endpoint to get up to 100 at a time
-    for sym in syms:
-        ticker=get_ticker(sym)
-        print sym,ticker['4. close']
-        '''
+    #for sym in syms:
+    #    ticker=get_ticker(sym)
+    #    print sym,ticker['4. close']
+'''
+    data=get_batch_tickers(syms[:10])
+    for item in data['Stock Quotes']:
+        print item
+
     ticker=get_ticker(syms[0])
     print syms[0]
     for key in ticker:
