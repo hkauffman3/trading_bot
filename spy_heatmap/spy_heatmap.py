@@ -62,16 +62,38 @@ def get_batch_tickers(symbols):
     response = urllib2.urlopen(url)
     rsp=response.read()
     data=json.loads(rsp)
+    #print rsp
     return data
+
+
+def get_div(symbol):
+    div=0
+    url = 'https://api.iextrading.com/1.0/stock/'+symbol+'/dividends/1y'
+    #url='https://finance.yahoo.com/quote/'+symbol+'/' 
+    response = urllib2.urlopen(url)
+    rsp=response.read()
+    data=json.loads(rsp)
+    for disp in data:
+        for key in disp:
+            print key,disp[key]
+    
+    return div
+
 
 if __name__=="__main__":
     syms=get_symbols()
     sum=0
+    ibm_div=get_div('IBM')
+
+'''
     print syms
     for ind in syms:
         sum+=len(syms[ind])
         print ind, len(syms[ind])
     print sum
+'''
+
+
     #this eventually fails because of a limit of 1 request per second
     #todo: use the endpoint to get up to 100 at a time
     #for sym in syms:
