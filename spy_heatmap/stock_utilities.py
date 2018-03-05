@@ -19,6 +19,32 @@ def get_div(symbol):
         div=float(data[0]['amount'])
     return div
 
+def get_dow():
+    symbols=[]
+    url='https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average'
+    response=urllib2.urlopen(url)
+    starter='<td>'
+    ender='</td>'
+    tab_i='<td>'
+    tab_f='</td>'
+    sig="nofollow"
+    data=response.read()
+    nyse="XNYS:"
+    nasdaq="symbol/"
+    #print data
+    while data.find(tab_i)!=-1 and data.find(tab_f)!=-1:
+        #print 'here'
+        section=data[(data.find(tab_i)+len(tab_i)):data.find(tab_f)]
+        #print section
+        if sig in section and 'span' not in section:
+            #entry=section.split("\n")
+            #ticker=entry[2]
+            print section
+            symbols.append(section[section.find('">')+2:section.find("</a>")])
+        data=data[data.find(tab_f)+len(tab_f):]
+    return symbols
+
+    
 def get_symbols():
     symbols=[]
     syms={}

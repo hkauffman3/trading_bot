@@ -19,6 +19,11 @@ this number may be high
 
 
 def run():
+    syms=ut.get_dow()
+    #syms=['IBM','AAPL']
+    print syms, len(syms)
+    
+def write_intrinsic_values(symbols):
     symbols=ut.get_symbols()
     for industry in symbols:
         print industry
@@ -40,6 +45,7 @@ def run():
                 print "Last Price: " + str(price)
     #for stat in stats:
     #    print stat+": "+str(stats[stat])
+
 
 def get_stats(symbol):
     url='https://api.iextrading.com/1.0/stock/'+symbol+'/stats'
