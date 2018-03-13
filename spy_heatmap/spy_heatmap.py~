@@ -1,0 +1,31 @@
+#!/usr/bin/python
+import time
+#import numpy as np
+import csv
+from datetime import datetime
+import urllib
+import urllib2
+import json
+
+API_KEY='WM49A5VBG9UVXZTD'
+
+def get_symbols():
+    symbols=[]
+    url='https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    response=urllib2.urlopen("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
+    return response.read() 
+
+
+def get_ticker(symbol):
+    url='https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo'
+    response = urllib2.urlopen(base_url + "/book/ethusd",data)
+    #print(type(response))
+    #sp=response.read().split('},{')
+    rsp=response.read()
+    data=json.loads(rsp)
+    
+    return symbols
+
+if __name__=="__main__":
+    symbols=get_symbols()
+    print symbols
