@@ -7,6 +7,13 @@ import urllib
 import urllib2
 import json
 
+def get_open(symbol):
+    url = 'https://api.iextrading.com/1.0/stock/'+symbol+'/ohlc'
+    response = urllib2.urlopen(url)
+    rsp=response.read()
+    data=json.loads(rsp)
+    return data['open']['price']
+#hunter branch
 def get_div(symbol):
     url = 'https://api.iextrading.com/1.0/stock/'+symbol+'/dividends/3m'
     response = urllib2.urlopen(url)
