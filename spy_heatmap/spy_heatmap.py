@@ -7,6 +7,7 @@ import urllib
 import urllib2
 import json
 import stock_utilities as ut
+from termcolor import colored
 
 
 API_KEY='WM49A5VBG9UVXZTD'
@@ -128,7 +129,11 @@ if __name__=="__main__":
             o=data['open']
             l=data['latestPrice']
             change=(l-o)/o
-            print sym,o,l,change
+            s=sym,o,l,change
+            color='green'
+            if change<0:
+                color='red'
+            print colored(s,color)
 '''
     print syms
     for ind in syms:
