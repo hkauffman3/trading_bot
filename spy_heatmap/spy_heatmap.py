@@ -95,7 +95,7 @@ def get_batch_tickers(symbols):
     if len(symbols)>100:
         return -1
     syms=','.join(symbols)
-    url='https://www.alphavantage.co/query?function=BATCH_STOCK_QUOTES&symbols='+syms+'&apikey='+API_KEY
+    url='https://api.iextrading.com/1.0/stock/market/batch?symbols='+syms+'&types=quote'
     response = urllib2.urlopen(url)
     rsp=response.read()
     data=json.loads(rsp)
@@ -116,8 +116,7 @@ def get_div(symbol):
     
     return div
 
-
-if __name__=="__main__":
+def slow_daily_performance():
     syms=get_symbols()
     print syms
     #sum=0
@@ -134,6 +133,32 @@ if __name__=="__main__":
             if change<0:
                 color='red'
             print colored(s,color)
+    return 1
+
+def faster_daily_performance():
+    syms=get_symbols()
+    print syms
+    print "Symbol, Open, Last, Change"
+    for ind in syms:
+        data=get_batch_tickers(syms[ind])
+        for sym in data:
+            o=data[sym]['quote']['open']
+            l=data[sym]['quote']['latestPrice']
+            change=(l-o)/o*100
+            s=sym,o,l,change
+            color='green'
+            if change<0:
+                color='red'
+            print colored(s,color)
+
+'''
+        for sym in syms[ind]:
+            data=get_ticker(sym)
+            
+'''
+
+if __name__=="__main__":
+    faster_daily_performance()
 '''
     print syms
     for ind in syms:
