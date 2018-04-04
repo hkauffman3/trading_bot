@@ -8,7 +8,7 @@ import urllib2
 import json
 import stock_utilities as ut
 from termcolor import colored
-
+import curses
 
 API_KEY='WM49A5VBG9UVXZTD'
 
@@ -156,9 +156,69 @@ def faster_daily_performance():
             data=get_ticker(sym)
             
 '''
+'''
+window design
+length 100
+record:
+|SYMB:+XXX.XX|
+7 records per line
+
+'''
+
+def window_tickers():
+    syms=get_symbols()
+    stdscr = curses.initscr()
+    curses.start_color()
+    curses.use_default_colors()
+    for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, i, -1)
+
+    sleept=0
+    while True:
+        col=0
+        row=0
+
+        for ind in syms:
+            data=get_batch_tickers(syms[ind])
+            try:
+                oops=stdscr.addstr(row,50-len(ind)/2,ind)
+            except:
+                curses.endwin()
+                print oops,row,50-len(ind)/2,ind 
+                return 1
+            row+=1
+            col=0
+            #stdscr.refresh()
+            for sym in data:
+                o=data[sym]['quote']['previousClose']
+                l=data[sym]['quote']['latestPrice']
+                change=(l-o)/o*100
+                color=curses.color_pair(3)
+                if change<0:
+                    color=curses.color_pair(2)
+                s='|'+sym+(4-len(sym))*' '+':'+str(change)[0:6]
+                try:
+                    error=stdscr.addstr(row,col,str(s),color)
+                except:
+                    curses.endwin()
+                    return 2
+                col+=len(s)
+                if col>140:
+                    row+=1
+                    col=0
+                    stdscr.refresh()
+            time.sleep(sleept)
+            row+=1 #increment col for new industry
+        sleept=1
+
+    curses.endwin()    
+
 
 if __name__=="__main__":
-    faster_daily_performance()
+    #faster_daily_performance()
+    a=window_tickers()
+    print a
+    print get_symbols()
 '''
     print syms
     for ind in syms:
